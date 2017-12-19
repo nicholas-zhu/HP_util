@@ -7,6 +7,7 @@ function [img_data, header] = Varian_14T_EPI_recon(folder_name, recon_params)
 %
 % Xucheng Zhu Dec/2017
 
+tmp_dir = pwd;
 fid_name = [folder_name,'/fid'];
 header_name = [folder_name,'/procpar'];
 fid = load_echoes(fid_name);
@@ -52,3 +53,5 @@ else
 end
 
 img_data = reshape(img_data,[crop_size,F,ncomp,nb,dyn]);
+
+cd(tmp_dir);
