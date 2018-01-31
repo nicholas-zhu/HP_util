@@ -1,4 +1,4 @@
-function [img_data, header] = Varian_14T_EPI_recon(folder_name, recon_params)
+function [img_data, header] = Varian_14T_EPI_recon2(folder_name, recon_params)
 % load k-space data/img data and header
 %
 % outputs:
@@ -33,6 +33,15 @@ if header.gre_dse == 1
 else
     data =  fid;
     F = 1;
+end
+
+if ~(isempty(recon_params.nfreq))
+    data = reshape(data,[X,Y,F,nb,ncomp,dyn]);
+    for i = 1:ncomp
+        data(:,:,:,:,i,:) = data(:,:,:,:,i,:).*repmat(exp(-1i*2*pi*(-Y/2:Y/2-1)/Y*...
+            recon_params.nfreq(i)*recon_params.dT),X,1,F,nb,1,dyn);
+    end
+    data = reshape(data,X,Y,F,T);
 end
 
 data = padarray(data,recon_params.psize);
