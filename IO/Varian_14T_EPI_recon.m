@@ -40,7 +40,7 @@ data = padarray(data,recon_params.psize);
 img_data = ifft2c(data);
 
 crop_ratio = recon_params.crop_ratio;
-crop_size = floor([X,Y])*crop_ratio;
+crop_size = floor([X,Y]*crop_ratio);
 img_data = crop2c(img_data,crop_size);
 
 img_data = reshape(img_data,[crop_size,F,nb,ncomp,dyn]);
