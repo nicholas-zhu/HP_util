@@ -19,13 +19,18 @@ F = header.slice;
 T = length(header.garray);
 
 % b values
-nb = recon_params.nb;
+% nb = recon_params.nb;
+% from header
+b_val = header.bval_array;
+nb = length(b_val);
 
 % number of metabolites
-ncomp = recon_params.ncomp;
+% ncomp = recon_params.ncomp;
+ncomp = header.cs;
 
 % dynamic values
-dyn = recon_params.dyn;
+% dyn = recon_params.dyn;
+dyn = header.celem/(ncomp*nb);
 
 if header.gre_dse == 1
     data = reshape(fid,[X,Y,F,T]);
