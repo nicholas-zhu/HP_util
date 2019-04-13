@@ -33,7 +33,7 @@ model = @expfun;
 options = optimset('MaxIter',1e15,'MaxFunEvals',1e15);
 estimates = fminsearch(model, start_point,options);
 fitted = estimates(1).*exp(-estimates(2).*xdata);
-rss = sum((fitted-ydata).^2);
+rss = sum((weight.*(fitted-ydata)).^2);
 rmse = sqrt(rss)./length(fitted);
 
 % expfun accepts curve parameters as inputs, and outputs sse,
