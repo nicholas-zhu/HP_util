@@ -31,6 +31,9 @@ ncomp = header.cs;
 % dynamic values
 % dyn = recon_params.dyn;
 dyn = header.celem/(ncomp*nb);
+if ~isfield(header,'gre_dse')
+    header.gre_dse = 0;
+end
 
 if header.gre_dse == 1
     data = reshape(fid,[X,Y,F,T]);
