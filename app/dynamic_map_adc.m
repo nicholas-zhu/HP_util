@@ -41,7 +41,7 @@ if reg_flag ==1
     [optimizer, metric] = imregconfig('monomodal');
     for i = 1:Dyn_N
         for j = 2:nb
-          img_arr(:,:,j,i) =imregister(img_arr(:,:,j,i),img_arr(:,:,1,i)*FAC_arr(j),'translation',optimizer, metric);
+          img_arr(:,:,j,i) =imregister(img_arr(:,:,j,i),img_arr(:,:,1,i)/FAC_arr(j),'translation',optimizer, metric);
         end
     end
     
