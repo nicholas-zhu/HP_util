@@ -20,7 +20,7 @@ end
 if nargin < 6
     if length(b_arr)>=4
         adc_range(:,1) = [0,0,1.8e-4,6e-4];
-        adc_range(:,2) = [inf,inf,2.2e-4,8e-4];
+        adc_range(:,2) = [inf,inf,2.5e-4,8e-4];
     else
         adc_range(:,1) = [0,0,6e-4];
         adc_range(:,2) = [inf,inf,8e-4];

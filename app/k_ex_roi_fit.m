@@ -49,15 +49,18 @@ lac_out_img = double(lac_out_img./permute(FAC_t1,[1 3 2]));
 
 dSin = squeeze(diff(sum(sum(lac_in_img,1),2),[],3))./dT_arr;
 dSout = squeeze(diff(sum(sum(lac_out_img,1),2),[],3))./dT_arr;
-Sin = squeeze(sum(sum(lac_in_img(:,:,1:end-1),1),2));
-Sout = squeeze(sum(sum(lac_out_img(:,:,1:end-1),1),2));
+% mean
+Sin = squeeze(sum(sum(lac_in_img(:,:,1:end-1)+lac_in_img(:,:,2:end),1),2))/2;
+Sout = squeeze(sum(sum(lac_out_img(:,:,1:end-1)+lac_out_img(:,:,2:end),1),2))/2;
 dSpyr = squeeze(diff(sum(sum(pyr_img(:,:,1:end),1),2),[],3))./dT_arr;
 
 %use CVX toolbox 
 cvx_begin  
-    variables k_inex F_lac; 
+    variable k_inex;
+    variable F_lac nonnegative; 
     minimize(sum((FAC_t1(1:end-1)'.*(dSin + k_inex*Sin + dSpyr)).^2)+...
         sum((FAC_t1(1:end-1)'.*(dSout - k_inex*Sin + F_lac*Sout)).^2)); 
+    
 cvx_end 
 
 
@@ -66,7 +69,7 @@ kmap.kex = k_inex;
 % evaluation
 eval.Sin = Sin.*(FAC_t1(1:length(dT_arr))');
 eval.Sout = Sout.*(FAC_t1(1:length(dT_arr))');
-eval.Spyr = dSpyr.*(FAC_t2(1:length(dT_arr))');
+eval.dSpyr = dSpyr.*(FAC_t2(1:length(dT_arr))');
 [Sin_e,Sout_e] = evalx(Sin,Sout,k_inex,F_lac,dSpyr,dT_arr);
 eval.Sin_e = Sin_e.*(FAC_t1(1:length(dT_arr))');
 eval.Sout_e = Sout_e.*(FAC_t1(1:length(dT_arr))');
@@ -74,25 +77,23 @@ eval.Sout_e = Sout_e.*(FAC_t1(1:length(dT_arr))');
 figure;hold on;
 plot([eval.Sin,eval.Sout],'-','LineWidth',1);
 plot([eval.Sin_e,eval.Sout_e],'--','LineWidth',1);
+legend('Sin','Sout','Sin_e','Sout_e');
 
 end
 
 function [Sin_e,Sout_e] = evalx(Sin,Sout,k_inex,F_lac,dSpyr,T_arr)
 
-Iter = 30;
+Iter = 1;
 iter = 0;
 Sin_e = zeros(length(T_arr),1);
 Sout_e = zeros(length(T_arr),1);
 Sin_e(1) = Sin(1);
 Sout_e(1) = Sout(1);
-while iter<=Iter
-    iter = iter + 1;
-    for i = 1:length(T_arr)-1
-        Sin_e(i+1) = -k_inex*T_arr(i)*Sin_e(i)-dSpyr(i)*T_arr(i);
-        Sout_e(i+1) = k_inex*T_arr(i)*Sin_e(i) - F_lac*T_arr(i)*Sout_e(i);
-    end
-    Sin_e(1) = Sin_e(1) - mean(Sin_e(1:3)-Sin(1:3));
-    Sout_e(1) = Sout_e(1) - mean(Sout_e(1:3)-Sout(1:3));
+
+for i = 1:length(T_arr)-1
+    Sin_e(i+1) = Sin(i)-k_inex*T_arr(i)*Sin(i) - dSpyr(i)*T_arr(i);
+    Sout_e(i+1) = Sout(i)+k_inex*T_arr(i)*Sin(i) - F_lac*T_arr(i)*Sout(i);
 end
+
 
 end

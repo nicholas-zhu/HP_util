@@ -53,12 +53,13 @@ F = zeros(size(mask));
 for k = 1:length(ind_x)
     dSin = squeeze(diff(lac_in_img(ind_x(k),ind_y(k),:),[],3))./dT_arr;
     dSout = squeeze(diff(lac_out_img(ind_x(k),ind_y(k),:),[],3))./dT_arr;
-    Sin = squeeze(lac_in_img(ind_x(k),ind_y(k),1:end-1));
-    Sout = squeeze(lac_out_img(ind_x(k),ind_y(k),1:end-1));
+    Sin = squeeze(lac_in_img(ind_x(k),ind_y(k),1:end-1)+lac_in_img(ind_x(k),ind_y(k),2:end))/2;
+    Sout = squeeze(lac_out_img(ind_x(k),ind_y(k),1:end-1)+lac_out_img(ind_x(k),ind_y(k),2:end))/2;
     dSpyr = squeeze(diff(sum(sum(pyr_img(ind_x(k),ind_y(k),1:end),1),2),[],3))./dT_arr;
     %use CVX toolbox 
     cvx_begin  
-        variables k_inex F_lac; 
+        variable k_inex;
+        variable F_lac nonnegative; 
         minimize(sum((FAC_t1(1:end-1)'.*(dSin + k_inex*Sin + dSpyr)).^2)+...
             sum((FAC_t1(1:end-1)'.*(dSout - k_inex*Sin + F_lac*Sout)).^2)); 
     cvx_end 
